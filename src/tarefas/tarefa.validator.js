@@ -69,12 +69,15 @@ function validarCampos(corpo, campos) {
   return { erros, dados };
 }
 
-/** Valida o cadastro de uma tarefa: todos os campos, com padrões e prazo não pode estar no passado. */
-export function validarNovaTarefa(corpo, { hoje = hojeISO() } = {}) {
+/**
+ * Valida uma tarefa completa (cadastro ou PUT): todos os campos, com padrões.
+ * No cadastro o prazo não pode estar no passado; no PUT use permitirPrazoPassado.
+ */
+export function validarNovaTarefa(corpo, { hoje = hojeISO(), permitirPrazoPassado = false } = {}) {
   if (!ehObjeto(corpo)) return falhaCorpo('O corpo da requisição deve ser um objeto JSON.');
 
   const { erros, dados } = validarCampos(corpo, CAMPOS_EDITAVEIS);
-  if (dados.prazo && dados.prazo < hoje) {
+  if (!permitirPrazoPassado && dados.prazo && dados.prazo < hoje) {
     erros.push({ campo: 'prazo', mensagem: 'O prazo não pode estar no passado.' });
   }
   return { valido: erros.length === 0, erros, dados };
