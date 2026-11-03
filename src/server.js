@@ -1,5 +1,5 @@
-import express from 'express';
 import { fileURLToPath } from 'node:url';
+import express from 'express';
 import { createApp } from './app.js';
 import { abrirBanco } from './db.js';
 

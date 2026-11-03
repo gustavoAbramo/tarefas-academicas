@@ -1,10 +1,10 @@
 import express from 'express';
 import { abrirBanco } from './db.js';
-import { hojeISO } from './tarefas/tarefa.validator.js';
-import { criarTarefaRepository } from './tarefas/tarefa.repository.js';
-import { criarTarefaService } from './tarefas/tarefa.service.js';
-import { criarTarefaRoutes } from './tarefas/tarefa.routes.js';
 import { rotaNaoEncontrada, tratarErros } from './http/erros.js';
+import { criarTarefaRepository } from './tarefas/tarefa.repository.js';
+import { criarTarefaRoutes } from './tarefas/tarefa.routes.js';
+import { criarTarefaService } from './tarefas/tarefa.service.js';
+import { hojeISO } from './tarefas/tarefa.validator.js';
 
 /**
  * Monta a aplicação Express.
