@@ -138,7 +138,7 @@ Base: `http://localhost:3000/api`. Todas as respostas são JSON. Detalhes e exem
 | Método | Rota | Descrição | Sucesso | Erros |
 | --- | --- | --- | --- | --- |
 | GET | `/health` | status da API | 200 | |
-| GET | `/tarefas` | lista tarefas (filtros `status`, `prioridade`, `atrasadas=true`) | 200 | 400 |
+| GET | `/tarefas` | lista tarefas (filtros `status`, `prioridade`, `atrasadas=true`, `busca`) | 200 | 400 |
 | GET | `/tarefas/resumo` | contagem por status e atrasadas | 200 | |
 | GET | `/tarefas/:id` | busca uma tarefa | 200 | 400, 404 |
 | POST | `/tarefas` | cadastra tarefa | 201 | 400 |
@@ -188,6 +188,7 @@ Erro de validação (400):
 - **Status**: `pendente` (padrão), `em_andamento` ou `concluida`.
 - Ao concluir, grava `concluidaEm`; ao reabrir, a data é limpa.
 - **Atrasada** = prazo já passou e a tarefa não foi concluída. É calculada na leitura (não fica salva).
+- **Busca** (`?busca=...`) filtra por título e descrição, sem diferenciar maiúsculas/minúsculas nem acentos.
 - Listagem ordenada por **prazo** e, no mesmo dia, por **prioridade** (alta primeiro).
 
 ## 9. Como contribuir (fluxo do grupo)
@@ -250,7 +251,6 @@ Para ser adicionado ao repositório (ele é privado), peça ao dono para te conv
 Ideias para o grupo pegar (cada uma vira uma branch + PR):
 
 - [ ] Entidade **Disciplina** com CRUD próprio (hoje a disciplina é um texto livre na tarefa)
-- [ ] Busca por texto no título/descrição (`GET /api/tarefas?busca=...`)
 - [ ] Paginação na listagem
 - [ ] Testes da interface (ex.: Playwright)
 - [ ] Login de usuário (cada aluno com suas tarefas)

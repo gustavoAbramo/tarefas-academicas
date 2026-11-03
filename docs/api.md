@@ -46,10 +46,12 @@ Formato: JSON (`Content-Type: application/json`).
 
 ## GET `/tarefas`
 
-Query opcionais: `status`, `prioridade`, `atrasadas=true`. Ordenado por prazo e prioridade.
+Query opcionais: `status`, `prioridade`, `atrasadas=true`, `busca`. Ordenado por prazo e prioridade.
+A `busca` considera título e descrição, sem diferenciar maiúsculas/minúsculas nem acentos.
 
 ```http
 GET /api/tarefas?status=pendente&prioridade=alta
+GET /api/tarefas?busca=relatorio
 ```
 
 ```json
