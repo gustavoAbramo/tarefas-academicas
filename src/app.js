@@ -16,7 +16,7 @@ export function createApp({ db = abrirBanco(':memory:'), hoje = hojeISO } = {}) 
 
   const service = criarTarefaService({ repository: criarTarefaRepository(db), hoje });
 
-  app.get('/api/health', (req, res) => {
+  app.get('/api/health', (_req, res) => {
     res.json({ status: 'ok' });
   });
   app.use('/api/tarefas', criarTarefaRoutes(service));

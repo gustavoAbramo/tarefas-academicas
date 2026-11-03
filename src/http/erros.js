@@ -20,12 +20,12 @@ export class ErroNaoEncontrado extends ErroHttp {
   }
 }
 
-export function rotaNaoEncontrada(req, res) {
+export function rotaNaoEncontrada(_req, res) {
   res.status(404).json({ erro: 'Rota não encontrada.' });
 }
 
 // eslint-disable-next-line no-unused-vars
-export function tratarErros(err, req, res, next) {
+export function tratarErros(err, _req, res, _next) {
   if (err.type === 'entity.parse.failed') {
     return res.status(400).json({ erro: 'JSON inválido no corpo da requisição.' });
   }
