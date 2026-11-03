@@ -1,0 +1,21 @@
+# Dependências
+node_modules/
+
+# Banco de dados local (gerado ao rodar a aplicação)
+data/*.db
+data/*.db-*
+
+# Variáveis de ambiente e credenciais
+.env
+.env.*
+!.env.example
+
+# Testes / cobertura
+coverage/
+
+# Sistema / editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
