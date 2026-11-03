@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { validarNovaTarefa, validarAtualizacaoTarefa } from '../src/tarefas/tarefa.validator.js';
+import { validarNovaTarefa, validarAtualizacaoTarefa, hojeISO } from '../src/tarefas/tarefa.validator.js';
 
 const HOJE = '2026-11-02';
 
@@ -126,5 +126,12 @@ describe('validarAtualizacaoTarefa', () => {
 
     expect(valido).toBe(false);
     expect(erros.map((e) => e.campo)).toEqual(expect.arrayContaining(['titulo', 'prioridade']));
+  });
+});
+
+describe('hojeISO', () => {
+  it('usa a data local, não a data em UTC', () => {
+    // 23h do dia 2 no horário local (em UTC-3 já seria dia 3).
+    expect(hojeISO(new Date(2026, 10, 2, 23, 0))).toBe('2026-11-02');
   });
 });

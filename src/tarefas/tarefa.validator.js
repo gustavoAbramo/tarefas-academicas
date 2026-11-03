@@ -6,8 +6,12 @@ export const STATUS = ['pendente', 'em_andamento', 'concluida'];
 const CAMPOS_EDITAVEIS = ['titulo', 'descricao', 'disciplina', 'prazo', 'prioridade', 'status'];
 const DATA_ISO = /^\d{4}-\d{2}-\d{2}$/;
 
-export function hojeISO() {
-  return new Date().toISOString().slice(0, 10);
+/** Data de hoje (AAAA-MM-DD) no fuso local do servidor — não em UTC, que já "vira o dia" às 21h no Brasil. */
+export function hojeISO(agora = new Date()) {
+  const ano = agora.getFullYear();
+  const mes = String(agora.getMonth() + 1).padStart(2, '0');
+  const dia = String(agora.getDate()).padStart(2, '0');
+  return `${ano}-${mes}-${dia}`;
 }
 
 function textoOpcional(valor) {
