@@ -92,6 +92,38 @@ describe('GET /api/tarefas', () => {
     expect(res.body.map((t) => t.titulo)).toEqual(['Alta pendente']);
   });
 
+  it('busca por texto no título e na descrição, ignorando maiúsculas e acentos', async () => {
+    await criar({ titulo: 'Relatório de TAP', descricao: 'Entrega final do semestre' });
+    await criar({ titulo: 'Lista de Cálculo', descricao: 'Exercícios do capítulo 3' });
+
+    const porTitulo = await request(app).get('/api/tarefas?busca=relatorio');
+    expect(porTitulo.status).toBe(200);
+    expect(porTitulo.body.map((t) => t.titulo)).toEqual(['Relatório de TAP']);
+
+    const porDescricao = await request(app).get('/api/tarefas?busca=capitulo');
+    expect(porDescricao.body.map((t) => t.titulo)).toEqual(['Lista de Cálculo']);
+  });
+
+  it('combina a busca com os demais filtros', async () => {
+    await criar({ titulo: 'Relatório de TAP', status: 'pendente' });
+    await criar({ titulo: 'Relatório de BD', status: 'concluida' });
+
+    const res = await request(app).get('/api/tarefas?busca=relatorio&status=pendente');
+
+    expect(res.body.map((t) => t.titulo)).toEqual(['Relatório de TAP']);
+  });
+
+  it('ignora busca vazia ou só com espaços', async () => {
+    await criar({ titulo: 'Relatório de TAP' });
+    await criar({ titulo: 'Lista de Cálculo' });
+
+    const vazia = await request(app).get('/api/tarefas?busca=');
+    const espacos = await request(app).get('/api/tarefas?busca=%20%20');
+
+    expect(vazia.body).toHaveLength(2);
+    expect(espacos.body).toHaveLength(2);
+  });
+
   it('rejeita filtro inválido com 400', async () => {
     const res = await request(app).get('/api/tarefas?status=qualquer');
 
