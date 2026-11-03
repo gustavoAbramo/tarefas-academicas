@@ -52,6 +52,8 @@ cd tarefas-academicas
 npm install
 ```
 
+> Para instalar exatamente as versões travadas no `package-lock.json`, use `npm ci` no lugar de `npm install`.
+
 > No PowerShell do Windows, se aparecer erro de "execução de scripts desabilitada", use `npm.cmd install`
 > (e `npm.cmd start`, `npm.cmd test`).
 
