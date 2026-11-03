@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tarefas Acadêmicas</title>
+    <meta name="description" content="Organize atividades, prazos e prioridades do semestre." />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%231f5f4a'/><path d='M9 16.5l4.5 4.5L23 11' stroke='white' stroke-width='3.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topo">
+      <div class="topo__marca">
+        <span class="topo__logo" aria-hidden="true">✓</span>
+        <div>
+          <h1>Tarefas Acadêmicas</h1>
+          <p>Atividades, prazos e prioridades do semestre</p>
+        </div>
+      </div>
+      <span id="api-status" class="api-status" title="Status da API">verificando API…</span>
+    </header>
+
+    <main class="layout">
+      <section class="resumo" aria-label="Resumo">
+        <button class="resumo__item" data-filtro-status="">
+          <span class="resumo__num" id="r-total">–</span><span>Total</span>
+        </button>
+        <button class="resumo__item" data-filtro-status="pendente">
+          <span class="resumo__num" id="r-pendente">–</span><span>Pendentes</span>
+        </button>
+        <button class="resumo__item" data-filtro-status="em_andamento">
+          <span class="resumo__num" id="r-em_andamento">–</span><span>Em andamento</span>
+        </button>
+        <button class="resumo__item" data-filtro-status="concluida">
+          <span class="resumo__num" id="r-concluida">–</span><span>Concluídas</span>
+        </button>
+        <button class="resumo__item resumo__item--alerta" data-filtro-atrasadas="true">
+          <span class="resumo__num" id="r-atrasadas">–</span><span>Atrasadas</span>
+        </button>
+      </section>
+
+      <section class="painel painel--form" aria-labelledby="form-titulo">
+        <h2 id="form-titulo">Nova tarefa</h2>
+        <form id="form-tarefa" novalidate>
+          <input type="hidden" name="id" />
+          <div class="campo">
+            <label for="titulo">Título <span aria-hidden="true">*</span></label>
+            <input id="titulo" name="titulo" maxlength="120" placeholder="Ex.: Relatório de laboratório" required />
+            <p class="campo__erro" data-erro="titulo"></p>
+          </div>
+          <div class="campo">
+            <label for="disciplina">Disciplina</label>
+            <input id="disciplina" name="disciplina" placeholder="Ex.: Banco de Dados" list="disciplinas" />
+            <datalist id="disciplinas"></datalist>
+          </div>
+          <div class="campo-linha">
+            <div class="campo">
+              <label for="prazo">Prazo <span aria-hidden="true">*</span></label>
+              <input id="prazo" name="prazo" type="date" required />
+              <p class="campo__erro" data-erro="prazo"></p>
+            </div>
+            <div class="campo">
+              <label for="prioridade">Prioridade</label>
+              <select id="prioridade" name="prioridade">
+                <option value="baixa">Baixa</option>
+                <option value="media" selected>Média</option>
+                <option value="alta">Alta</option>
+              </select>
+            </div>
+          </div>
+          <div class="campo" id="campo-status" hidden>
+            <label for="status">Status</label>
+            <select id="status" name="status">
+              <option value="pendente">Pendente</option>
+              <option value="em_andamento">Em andamento</option>
+              <option value="concluida">Concluída</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label for="descricao">Descrição</label>
+            <textarea id="descricao" name="descricao" rows="3" placeholder="Detalhes, links, observações…"></textarea>
+          </div>
+          <p class="form__erro" id="form-erro" role="alert"></p>
+          <div class="acoes">
+            <button type="submit" class="botao botao--primario" id="botao-salvar">Adicionar tarefa</button>
+            <button type="button" class="botao" id="botao-cancelar" hidden>Cancelar edição</button>
+          </div>
+        </form>
+
+        <details class="api-log">
+          <summary>Últimas requisições à API</summary>
+          <pre id="api-log">Nenhuma requisição ainda.</pre>
+        </details>
+      </section>
+
+      <section class="painel painel--lista" aria-labelledby="lista-titulo">
+        <div class="lista__cabecalho">
+          <h2 id="lista-titulo">Tarefas</h2>
+          <div class="filtros">
+            <label class="sr-only" for="filtro-status">Filtrar por status</label>
+            <select id="filtro-status">
+              <option value="">Todos os status</option>
+              <option value="pendente">Pendentes</option>
+              <option value="em_andamento">Em andamento</option>
+              <option value="concluida">Concluídas</option>
+            </select>
+            <label class="sr-only" for="filtro-prioridade">Filtrar por prioridade</label>
+            <select id="filtro-prioridade">
+              <option value="">Todas as prioridades</option>
+              <option value="alta">Alta</option>
+              <option value="media">Média</option>
+              <option value="baixa">Baixa</option>
+            </select>
+            <label class="check">
+              <input type="checkbox" id="filtro-atrasadas" /> Só atrasadas
+            </label>
+          </div>
+        </div>
+        <ul id="lista" class="lista" aria-live="polite"></ul>
+        <p id="vazio" class="vazio" hidden>Nenhuma tarefa por aqui. Cadastre a primeira ao lado.</p>
+      </section>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <template id="tpl-tarefa">
+      <li class="tarefa">
+        <div class="tarefa__topo">
+          <button class="tarefa__check" type="button"></button>
+          <div class="tarefa__texto">
+            <h3 class="tarefa__titulo"></h3>
+            <p class="tarefa__meta"></p>
+            <p class="tarefa__descricao"></p>
+          </div>
+        </div>
+        <div class="tarefa__rodape">
+          <span class="chip chip--prioridade"></span>
+          <span class="chip chip--prazo"></span>
+          <select class="tarefa__status" aria-label="Alterar status">
+            <option value="pendente">Pendente</option>
+            <option value="em_andamento">Em andamento</option>
+            <option value="concluida">Concluída</option>
+          </select>
+          <span class="tarefa__acoes">
+            <button class="botao botao--mini" data-acao="editar" type="button">Editar</button>
+            <button class="botao botao--mini botao--perigo" data-acao="excluir" type="button">Excluir</button>
+          </span>
+        </div>
+      </li>
+    </template>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
