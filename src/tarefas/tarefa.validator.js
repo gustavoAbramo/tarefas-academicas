@@ -1,70 +1,92 @@
-export function validarNovaTarefa(corpo, { hoje } = {}) {
-  const erros = [];
-  if (corpo === null || typeof corpo !== 'object' || Array.isArray(corpo)) {
-    return { valido: false, erros: [{ campo: 'corpo', mensagem: 'O corpo da requisição deve ser um objeto JSON.' }], dados: null };
-  }
+// Regras de negócio de uma tarefa acadêmica.
+// Cada validador de campo recebe o valor bruto e devolve { valor } ou { erro }.
 
-  const titulo = typeof corpo.titulo === 'string' ? corpo.titulo.trim() : '';
-  if (!titulo) {
-    erros.push({ campo: 'titulo', mensagem: 'O título é obrigatório.' });
-  } else if (titulo.length < 3 || titulo.length > 120) {
-    erros.push({ campo: 'titulo', mensagem: 'O título deve ter entre 3 e 120 caracteres.' });
-  }
+export const PRIORIDADES = ['baixa', 'media', 'alta'];
+export const STATUS = ['pendente', 'em_andamento', 'concluida'];
+const CAMPOS_EDITAVEIS = ['titulo', 'descricao', 'disciplina', 'prazo', 'prioridade', 'status'];
+const DATA_ISO = /^\d{4}-\d{2}-\d{2}$/;
 
-  const prazo = corpo.prazo;
-  if (!prazo) {
-    erros.push({ campo: 'prazo', mensagem: 'O prazo é obrigatório.' });
-  } else if (typeof prazo !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(prazo)) {
-    erros.push({ campo: 'prazo', mensagem: 'O prazo deve estar no formato AAAA-MM-DD.' });
-  } else {
-    const d = new Date(prazo + 'T00:00:00Z');
-    if (isNaN(d) || d.toISOString().slice(0, 10) !== prazo) {
-      erros.push({ campo: 'prazo', mensagem: 'O prazo não é uma data válida.' });
-    } else if (prazo < (hoje ?? new Date().toISOString().slice(0, 10))) {
-      erros.push({ campo: 'prazo', mensagem: 'O prazo não pode estar no passado.' });
-    }
-  }
-
-  const prioridade = corpo.prioridade ?? 'media';
-  if (!['baixa', 'media', 'alta'].includes(prioridade)) {
-    erros.push({ campo: 'prioridade', mensagem: 'A prioridade deve ser baixa, media ou alta.' });
-  }
-
-  const status = corpo.status ?? 'pendente';
-  if (!['pendente', 'em_andamento', 'concluida'].includes(status)) {
-    erros.push({ campo: 'status', mensagem: 'O status deve ser pendente, em_andamento ou concluida.' });
-  }
-
-  return {
-    valido: erros.length === 0,
-    erros,
-    dados: {
-      titulo,
-      descricao: typeof corpo.descricao === 'string' ? corpo.descricao.trim() : '',
-      disciplina: typeof corpo.disciplina === 'string' ? corpo.disciplina.trim() : '',
-      prazo,
-      prioridade,
-      status,
-    },
-  };
+export function hojeISO() {
+  return new Date().toISOString().slice(0, 10);
 }
 
-export function validarAtualizacaoTarefa(corpo) {
-  if (corpo === null || typeof corpo !== 'object' || Array.isArray(corpo)) {
-    return { valido: false, erros: [{ campo: 'corpo', mensagem: 'O corpo da requisição deve ser um objeto JSON.' }], dados: null };
-  }
-  const campos = ['titulo', 'descricao', 'disciplina', 'prazo', 'prioridade', 'status'];
-  const enviados = Object.keys(corpo).filter((k) => campos.includes(k));
-  if (enviados.length === 0) {
-    return { valido: false, erros: [{ campo: 'corpo', mensagem: 'Envie ao menos um campo para atualizar.' }], dados: null };
-  }
+function textoOpcional(valor) {
+  return { valor: typeof valor === 'string' ? valor.trim() : '' };
+}
 
-  const completo = validarNovaTarefa(
-    { titulo: 'xxx', prazo: '2000-01-01', ...corpo },
-    { hoje: '0000-01-01' },
-  );
-  const erros = completo.erros.filter((e) => enviados.includes(e.campo));
+const validadores = {
+  titulo(valor) {
+    const titulo = typeof valor === 'string' ? valor.trim() : '';
+    if (!titulo) return { erro: 'O título é obrigatório.' };
+    if (titulo.length < 3 || titulo.length > 120) {
+      return { erro: 'O título deve ter entre 3 e 120 caracteres.' };
+    }
+    return { valor: titulo };
+  },
+
+  descricao: textoOpcional,
+  disciplina: textoOpcional,
+
+  prazo(valor) {
+    if (!valor) return { erro: 'O prazo é obrigatório.' };
+    if (typeof valor !== 'string' || !DATA_ISO.test(valor)) {
+      return { erro: 'O prazo deve estar no formato AAAA-MM-DD.' };
+    }
+    const data = new Date(`${valor}T00:00:00Z`);
+    if (Number.isNaN(data.getTime()) || data.toISOString().slice(0, 10) !== valor) {
+      return { erro: 'O prazo não é uma data válida.' };
+    }
+    return { valor };
+  },
+
+  prioridade(valor = 'media') {
+    if (!PRIORIDADES.includes(valor)) return { erro: `A prioridade deve ser ${PRIORIDADES.join(', ')}.` };
+    return { valor };
+  },
+
+  status(valor = 'pendente') {
+    if (!STATUS.includes(valor)) return { erro: `O status deve ser ${STATUS.join(', ')}.` };
+    return { valor };
+  },
+};
+
+function ehObjeto(corpo) {
+  return corpo !== null && typeof corpo === 'object' && !Array.isArray(corpo);
+}
+
+function falhaCorpo(mensagem) {
+  return { valido: false, erros: [{ campo: 'corpo', mensagem }], dados: null };
+}
+
+function validarCampos(corpo, campos) {
+  const erros = [];
   const dados = {};
-  for (const k of enviados) dados[k] = completo.dados[k];
+  for (const campo of campos) {
+    const { valor, erro } = validadores[campo](corpo[campo]);
+    if (erro) erros.push({ campo, mensagem: erro });
+    else dados[campo] = valor;
+  }
+  return { erros, dados };
+}
+
+/** Valida o cadastro de uma tarefa: todos os campos, com padrões e prazo não pode estar no passado. */
+export function validarNovaTarefa(corpo, { hoje = hojeISO() } = {}) {
+  if (!ehObjeto(corpo)) return falhaCorpo('O corpo da requisição deve ser um objeto JSON.');
+
+  const { erros, dados } = validarCampos(corpo, CAMPOS_EDITAVEIS);
+  if (dados.prazo && dados.prazo < hoje) {
+    erros.push({ campo: 'prazo', mensagem: 'O prazo não pode estar no passado.' });
+  }
+  return { valido: erros.length === 0, erros, dados };
+}
+
+/** Valida uma atualização parcial: só os campos enviados. Prazo passado é permitido (tarefa atrasada). */
+export function validarAtualizacaoTarefa(corpo) {
+  if (!ehObjeto(corpo)) return falhaCorpo('O corpo da requisição deve ser um objeto JSON.');
+
+  const enviados = CAMPOS_EDITAVEIS.filter((campo) => campo in corpo);
+  if (enviados.length === 0) return falhaCorpo('Envie ao menos um campo para atualizar.');
+
+  const { erros, dados } = validarCampos(corpo, enviados);
   return { valido: erros.length === 0, erros, dados };
 }
