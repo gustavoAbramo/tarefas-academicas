@@ -1,7 +1,24 @@
 {
   "name": "tarefas-academicas",
   "version": "1.0.0",
+  "private": true,
   "description": "Gerenciador de tarefas acadêmicas com API REST (Express + SQLite), TDD (Vitest + Supertest) e interface web.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gustavoAbramo/tarefas-academicas.git"
+  },
+  "bugs": {
+    "url": "https://github.com/gustavoAbramo/tarefas-academicas/issues"
+  },
+  "homepage": "https://github.com/gustavoAbramo/tarefas-academicas#readme",
+  "keywords": [
+    "tarefas",
+    "academicas",
+    "express",
+    "sqlite",
+    "tdd",
+    "vitest"
+  ],
   "type": "module",
   "main": "src/server.js",
   "scripts": {
