@@ -153,7 +153,8 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
 .lista__cabecalho { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 14px; }
 .lista__cabecalho h2 { margin: 0; }
 .filtros { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.filtros select { width: auto; padding: 6px 10px; font-size: .85rem; }
+.filtros select, .filtros input[type="search"] { width: auto; padding: 6px 10px; font-size: .85rem; }
+.filtros input[type="search"] { min-width: 190px; }
 .check { display: inline-flex; align-items: center; gap: 6px; font-weight: 500; cursor: pointer; }
 .check input { width: auto; }
 
