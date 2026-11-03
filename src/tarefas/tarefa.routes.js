@@ -20,8 +20,8 @@ export function criarTarefaRoutes(service) {
   const router = Router();
 
   router.get('/', rota((req, res) => {
-    const { status, prioridade, atrasadas } = req.query;
-    res.json(service.listar({ status, prioridade, atrasadas: atrasadas === 'true' }));
+    const { status, prioridade, atrasadas, busca } = req.query;
+    res.json(service.listar({ status, prioridade, busca, atrasadas: atrasadas === 'true' }));
   }));
 
   // Precisa vir antes de "/:id" para "resumo" não ser lido como id.

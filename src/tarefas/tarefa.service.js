@@ -8,6 +8,19 @@ export function estaAtrasada(tarefa, hoje) {
   return tarefa.status !== 'concluida' && tarefa.prazo < hoje;
 }
 
+/** Normaliza texto para busca: sem acentos e sem diferenciar maiúsculas de minúsculas. */
+function normalizarBusca(texto) {
+  return String(texto ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLocaleLowerCase('pt-BR');
+}
+
+function combinaBusca(tarefa, termo) {
+  if (!termo) return true;
+  return normalizarBusca(`${tarefa.titulo} ${tarefa.descricao}`).includes(termo);
+}
+
 export function criarTarefaService({ repository, hoje, agora = () => new Date().toISOString() }) {
   // "atrasada" é calculada na leitura (depende do dia de hoje), não fica salva no banco.
   const comAtraso = (tarefa) => ({ ...tarefa, atrasada: estaAtrasada(tarefa, hoje()) });
@@ -35,14 +48,18 @@ export function criarTarefaService({ repository, hoje, agora = () => new Date().
   }
 
   return {
-    listar({ status, prioridade, atrasadas } = {}) {
+    listar({ status, prioridade, atrasadas, busca } = {}) {
       if (status && !STATUS.includes(status)) {
         throw new ErroValidacao('Filtro de status inválido.');
       }
       if (prioridade && !PRIORIDADES.includes(prioridade)) {
         throw new ErroValidacao('Filtro de prioridade inválido.');
       }
-      const tarefas = repository.listar({ status, prioridade }).map(comAtraso);
+      const termo = typeof busca === 'string' ? normalizarBusca(busca).trim() : '';
+      const tarefas = repository
+        .listar({ status, prioridade })
+        .map(comAtraso)
+        .filter((tarefa) => combinaBusca(tarefa, termo));
       return atrasadas ? tarefas.filter((t) => t.atrasada) : tarefas;
     },
 

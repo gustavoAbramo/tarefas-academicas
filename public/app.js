@@ -6,6 +6,7 @@ const form = $('#form-tarefa');
 const lista = $('#lista');
 const template = $('#tpl-tarefa');
 const filtros = {
+  busca: $('#filtro-busca'),
   status: $('#filtro-status'),
   prioridade: $('#filtro-prioridade'),
   atrasadas: $('#filtro-atrasadas'),
@@ -99,6 +100,7 @@ let disciplinasConhecidas = new Set();
 
 async function carregarTarefas() {
   const tarefas = await api.listar({
+    busca: filtros.busca.value.trim(),
     status: filtros.status.value,
     prioridade: filtros.prioridade.value,
     atrasadas: filtros.atrasadas.checked ? 'true' : '',
@@ -226,10 +228,19 @@ $('#botao-cancelar').addEventListener('click', sairDaEdicao);
 
 // ---------- filtros ----------
 
-Object.values(filtros).forEach((el) => el.addEventListener('change', atualizarTela));
+[filtros.status, filtros.prioridade, filtros.atrasadas].forEach((el) => el.addEventListener('change', atualizarTela));
+
+// A busca é digitada: espera o usuário parar de digitar para não disparar uma requisição por tecla.
+let timerBusca;
+filtros.busca.addEventListener('input', () => {
+  clearTimeout(timerBusca);
+  timerBusca = setTimeout(atualizarTela, 300);
+});
 
 document.querySelectorAll('.resumo__item').forEach((botao) => {
   botao.addEventListener('click', () => {
+    clearTimeout(timerBusca);
+    filtros.busca.value = '';
     filtros.status.value = botao.dataset.filtroStatus ?? '';
     filtros.prioridade.value = '';
     filtros.atrasadas.checked = botao.dataset.filtroAtrasadas === 'true';

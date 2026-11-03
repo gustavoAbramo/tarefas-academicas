@@ -24,6 +24,7 @@ e **o que já está atrasado**.
 | RF06 | Excluir tarefa, com confirmação |
 | RF07 | Mostrar resumo: total, por status e atrasadas |
 | RF08 | Indicar visualmente tarefas atrasadas e que vencem hoje |
+| RF09 | Buscar tarefas por texto no título ou na descrição |
 
 ## Requisitos não funcionais
 
