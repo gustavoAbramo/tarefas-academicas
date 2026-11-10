@@ -99,6 +99,9 @@ button, input, select, textarea { font: inherit; color: inherit; }
   border-radius: var(--raio); box-shadow: var(--sombra); padding: 20px;
 }
 .painel h2 { font-size: 1.05rem; margin-bottom: 14px; }
+.painel__cabecalho { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+.painel__cabecalho h2 { margin: 0; }
+.painel__cabecalho .botao { flex: none; }
 
 /* Resumo */
 .resumo { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }

@@ -6,6 +6,8 @@ const form = $('#form-tarefa');
 const lista = $('#lista');
 const template = $('#tpl-tarefa');
 const calendarioCorpo = $('#calendario-corpo');
+const conteudoFormulario = $('#form-conteudo');
+const botaoRecolherFormulario = $('#botao-recolher-form');
 const filtros = {
   busca: $('#filtro-busca'),
   status: $('#filtro-status'),
@@ -253,6 +255,7 @@ function mostrarErros(detalhes) {
 }
 
 function iniciarEdicao(tarefa) {
+  definirFormularioRecolhido(false);
   limparErros();
   for (const campo of ['id', 'titulo', 'disciplina', 'prazo', 'prioridade', 'status', 'descricao']) {
     form.elements[campo].value = tarefa[campo] ?? '';
@@ -310,6 +313,16 @@ form.addEventListener('submit', async (evento) => {
 });
 
 $('#botao-cancelar').addEventListener('click', sairDaEdicao);
+
+function definirFormularioRecolhido(recolhido) {
+  conteudoFormulario.hidden = recolhido;
+  botaoRecolherFormulario.setAttribute('aria-expanded', String(!recolhido));
+  botaoRecolherFormulario.textContent = recolhido ? 'Mostrar formulário' : 'Recolher formulário';
+}
+
+botaoRecolherFormulario.addEventListener('click', () => {
+  definirFormularioRecolhido(!conteudoFormulario.hidden);
+});
 
 // ---------- filtros ----------
 

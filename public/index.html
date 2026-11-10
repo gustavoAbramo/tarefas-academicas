@@ -40,57 +40,63 @@
       </section>
 
       <section class="painel painel--form" aria-labelledby="form-titulo">
-        <h2 id="form-titulo">Nova tarefa</h2>
-        <form id="form-tarefa" novalidate>
-          <input type="hidden" name="id" />
-          <div class="campo">
-            <label for="titulo">Título <span aria-hidden="true">*</span></label>
-            <input id="titulo" name="titulo" maxlength="120" placeholder="Ex.: Relatório de laboratório" required />
-            <p class="campo__erro" data-erro="titulo"></p>
-          </div>
-          <div class="campo">
-            <label for="disciplina">Disciplina</label>
-            <input id="disciplina" name="disciplina" placeholder="Ex.: Banco de Dados" list="disciplinas" />
-            <datalist id="disciplinas"></datalist>
-          </div>
-          <div class="campo-linha">
+        <div class="painel__cabecalho">
+          <h2 id="form-titulo">Nova tarefa</h2>
+          <button type="button" class="botao botao--mini" id="botao-recolher-form" aria-expanded="true" aria-controls="form-conteudo">
+            Recolher formulário
+          </button>
+        </div>
+        <div id="form-conteudo">
+          <form id="form-tarefa" novalidate>
             <div class="campo">
-              <label for="prazo">Prazo <span aria-hidden="true">*</span></label>
-              <input id="prazo" name="prazo" type="date" required />
-              <p class="campo__erro" data-erro="prazo"></p>
+              <label for="titulo">Título <span aria-hidden="true">*</span></label>
+              <input id="titulo" name="titulo" maxlength="120" placeholder="Ex.: Relatório de laboratório" required />
+              <p class="campo__erro" data-erro="titulo"></p>
             </div>
             <div class="campo">
-              <label for="prioridade">Prioridade</label>
-              <select id="prioridade" name="prioridade">
-                <option value="baixa">Baixa</option>
-                <option value="media" selected>Média</option>
-                <option value="alta">Alta</option>
+              <label for="disciplina">Disciplina</label>
+              <input id="disciplina" name="disciplina" placeholder="Ex.: Banco de Dados" list="disciplinas" />
+              <datalist id="disciplinas"></datalist>
+            </div>
+            <div class="campo-linha">
+              <div class="campo">
+                <label for="prazo">Prazo <span aria-hidden="true">*</span></label>
+                <input id="prazo" name="prazo" type="date" required />
+                <p class="campo__erro" data-erro="prazo"></p>
+              </div>
+              <div class="campo">
+                <label for="prioridade">Prioridade</label>
+                <select id="prioridade" name="prioridade">
+                  <option value="baixa">Baixa</option>
+                  <option value="media" selected>Média</option>
+                  <option value="alta">Alta</option>
+                </select>
+              </div>
+            </div>
+            <div class="campo" id="campo-status" hidden>
+              <label for="status">Status</label>
+              <select id="status" name="status">
+                <option value="pendente">Pendente</option>
+                <option value="em_andamento">Em andamento</option>
+                <option value="concluida">Concluída</option>
               </select>
             </div>
-          </div>
-          <div class="campo" id="campo-status" hidden>
-            <label for="status">Status</label>
-            <select id="status" name="status">
-              <option value="pendente">Pendente</option>
-              <option value="em_andamento">Em andamento</option>
-              <option value="concluida">Concluída</option>
-            </select>
-          </div>
-          <div class="campo">
-            <label for="descricao">Descrição</label>
-            <textarea id="descricao" name="descricao" rows="3" placeholder="Detalhes, links, observações…"></textarea>
-          </div>
-          <p class="form__erro" id="form-erro" role="alert"></p>
-          <div class="acoes">
-            <button type="submit" class="botao botao--primario" id="botao-salvar">Adicionar tarefa</button>
-            <button type="button" class="botao" id="botao-cancelar" hidden>Cancelar edição</button>
-          </div>
-        </form>
+            <div class="campo">
+              <label for="descricao">Descrição</label>
+              <textarea id="descricao" name="descricao" rows="3" placeholder="Detalhes, links, observações…"></textarea>
+            </div>
+            <p class="form__erro" id="form-erro" role="alert"></p>
+            <div class="acoes">
+              <button type="submit" class="botao botao--primario" id="botao-salvar">Adicionar tarefa</button>
+              <button type="button" class="botao" id="botao-cancelar" hidden>Cancelar edição</button>
+            </div>
+          </form>
 
-        <details class="api-log" hidden>
-          <summary>Últimas requisições à API</summary>
-          <pre id="api-log">Nenhuma requisição ainda.</pre>
-        </details>
+          <details class="api-log" hidden>
+            <summary>Últimas requisições à API</summary>
+            <pre id="api-log">Nenhuma requisição ainda.</pre>
+          </details>
+        </div>
       </section>
 
       <section class="painel painel--lista" aria-labelledby="lista-titulo">
