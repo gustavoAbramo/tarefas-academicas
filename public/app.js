@@ -5,6 +5,7 @@ const $ = (seletor) => document.querySelector(seletor);
 const form = $('#form-tarefa');
 const lista = $('#lista');
 const template = $('#tpl-tarefa');
+const calendarioCorpo = $('#calendario-corpo');
 const filtros = {
   busca: $('#filtro-busca'),
   status: $('#filtro-status'),
@@ -14,6 +15,9 @@ const filtros = {
 
 const ROTULO_PRIORIDADE = { alta: 'Prioridade alta', media: 'Prioridade média', baixa: 'Prioridade baixa' };
 const ORDEM_PRIORIDADE = { alta: 0, media: 1, baixa: 2 };
+const ROTULO_STATUS = { pendente: 'Pendente', em_andamento: 'Em andamento', concluida: 'Concluída' };
+let tarefasAtuais = [];
+let mesCalendario = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 
 // ---------- utilidades ----------
 
@@ -25,6 +29,13 @@ function hojeLocal() {
 function formatarData(iso) {
   const [ano, mes, dia] = iso.split('-');
   return `${dia}/${mes}/${ano}`;
+}
+
+function dataLocal(data) {
+  const ano = data.getFullYear();
+  const mes = String(data.getMonth() + 1).padStart(2, '0');
+  const dia = String(data.getDate()).padStart(2, '0');
+  return `${ano}-${mes}-${dia}`;
 }
 
 function textoPrazo(tarefa) {
@@ -106,6 +117,68 @@ function renderizarTarefa(tarefa) {
   return item;
 }
 
+function renderizarCalendario() {
+  const mes = mesCalendario.getMonth();
+  const ano = mesCalendario.getFullYear();
+  $('#calendario-mes').textContent = new Intl.DateTimeFormat('pt-BR', {
+    month: 'long',
+    year: 'numeric',
+  }).format(mesCalendario);
+
+  const primeiroDia = new Date(ano, mes, 1);
+  const deslocamento = (primeiroDia.getDay() + 6) % 7;
+  const diasNoMes = new Date(ano, mes + 1, 0).getDate();
+  const totalDias = Math.ceil((deslocamento + diasNoMes) / 7) * 7;
+  const tarefasPorPrazo = new Map();
+  for (const tarefa of tarefasAtuais) {
+    if (!tarefasPorPrazo.has(tarefa.prazo)) tarefasPorPrazo.set(tarefa.prazo, []);
+    tarefasPorPrazo.get(tarefa.prazo).push(tarefa);
+  }
+
+  const hoje = hojeLocal();
+  const linhas = [];
+  for (let inicio = 0; inicio < totalDias; inicio += 7) {
+    const linha = document.createElement('tr');
+    for (let coluna = 0; coluna < 7; coluna++) {
+      const indice = inicio + coluna;
+      const data = new Date(ano, mes, indice - deslocamento + 1);
+      const iso = dataLocal(data);
+      const celula = document.createElement('td');
+      celula.className = 'calendario__dia';
+      if (data.getMonth() !== mes) celula.classList.add('calendario__dia--outro-mes');
+      if (iso === hoje) celula.classList.add('calendario__dia--hoje');
+      celula.setAttribute('aria-label', new Intl.DateTimeFormat('pt-BR', {
+        dateStyle: 'full',
+      }).format(data));
+
+      const numero = document.createElement('time');
+      numero.className = 'calendario__numero';
+      numero.dateTime = iso;
+      numero.textContent = data.getDate();
+      if (iso === hoje) numero.setAttribute('aria-current', 'date');
+      celula.append(numero);
+
+      const tarefasDoDia = (tarefasPorPrazo.get(iso) ?? []).sort(compararTarefas);
+      for (const tarefa of tarefasDoDia) {
+        const evento = document.createElement('button');
+        evento.type = 'button';
+        evento.className = `calendario__tarefa calendario__tarefa--${tarefa.prioridade}`;
+        if (tarefa.status === 'concluida') evento.classList.add('calendario__tarefa--concluida');
+        evento.textContent = tarefa.titulo;
+        evento.title = `${tarefa.titulo} · ${ROTULO_STATUS[tarefa.status]}`;
+        evento.setAttribute('aria-label', `${tarefa.titulo}, ${ROTULO_PRIORIDADE[tarefa.prioridade]}, ${ROTULO_STATUS[tarefa.status]}`);
+        evento.addEventListener('click', () => iniciarEdicao(tarefa));
+        celula.append(evento);
+      }
+
+      linha.append(celula);
+    }
+    linhas.push(linha);
+  }
+  calendarioCorpo.replaceChildren(...linhas);
+  $('#calendario-vazio').hidden = tarefasAtuais.length > 0;
+}
+
 let disciplinasConhecidas = new Set();
 
 async function carregarTarefas() {
@@ -115,7 +188,9 @@ async function carregarTarefas() {
     prioridade: filtros.prioridade.value,
     atrasadas: filtros.atrasadas.checked ? 'true' : '',
   });
+  tarefasAtuais = tarefas;
   lista.replaceChildren(...[...tarefas].sort(compararTarefas).map(renderizarTarefa));
+  renderizarCalendario();
   $('#vazio').hidden = tarefas.length > 0;
 
   for (const t of tarefas) if (t.disciplina) disciplinasConhecidas.add(t.disciplina);
@@ -256,6 +331,36 @@ document.querySelectorAll('.resumo__item').forEach((botao) => {
     filtros.atrasadas.checked = botao.dataset.filtroAtrasadas === 'true';
     atualizarTela();
   });
+});
+
+// ---------- visualização em calendário ----------
+
+const botaoLista = $('#visualizacao-lista');
+const botaoCalendario = $('#visualizacao-calendario');
+const conteudoLista = $('#visualizacao-conteudo-lista');
+const conteudoCalendario = $('#visualizacao-conteudo-calendario');
+
+function selecionarVisualizacao(calendario) {
+  conteudoLista.hidden = calendario;
+  conteudoCalendario.hidden = !calendario;
+  botaoLista.setAttribute('aria-pressed', String(!calendario));
+  botaoCalendario.setAttribute('aria-pressed', String(calendario));
+}
+
+botaoLista.addEventListener('click', () => selecionarVisualizacao(false));
+botaoCalendario.addEventListener('click', () => selecionarVisualizacao(true));
+$('#calendario-anterior').addEventListener('click', () => {
+  mesCalendario = new Date(mesCalendario.getFullYear(), mesCalendario.getMonth() - 1, 1);
+  renderizarCalendario();
+});
+$('#calendario-proximo').addEventListener('click', () => {
+  mesCalendario = new Date(mesCalendario.getFullYear(), mesCalendario.getMonth() + 1, 1);
+  renderizarCalendario();
+});
+$('#calendario-hoje').addEventListener('click', () => {
+  const hoje = new Date();
+  mesCalendario = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+  renderizarCalendario();
 });
 
 // ---------- painel "últimas requisições à API" (mais recente primeiro) ----------

@@ -96,6 +96,10 @@
       <section class="painel painel--lista" aria-labelledby="lista-titulo">
         <div class="lista__cabecalho">
           <h2 id="lista-titulo">Tarefas</h2>
+          <div class="visualizacao" role="group" aria-label="Tipo de visualização">
+            <button type="button" class="botao botao--visualizacao" id="visualizacao-lista" aria-pressed="true">Lista</button>
+            <button type="button" class="botao botao--visualizacao" id="visualizacao-calendario" aria-pressed="false">Calendário</button>
+          </div>
           <div class="filtros">
             <label class="sr-only" for="filtro-busca">Buscar tarefas</label>
             <input type="search" id="filtro-busca" placeholder="Buscar título ou descrição…" autocomplete="off" />
@@ -118,8 +122,36 @@
             </label>
           </div>
         </div>
-        <ul id="lista" class="lista" aria-live="polite"></ul>
-        <p id="vazio" class="vazio" hidden>Nenhuma tarefa por aqui. Cadastre a primeira ao lado.</p>
+        <div id="visualizacao-conteudo-lista">
+          <ul id="lista" class="lista" aria-live="polite"></ul>
+          <p id="vazio" class="vazio" hidden>Nenhuma tarefa por aqui. Cadastre a primeira ao lado.</p>
+        </div>
+        <section id="visualizacao-conteudo-calendario" class="calendario-painel" aria-label="Calendário de tarefas" hidden>
+          <div class="calendario__cabecalho">
+            <h3 id="calendario-mes" aria-live="polite"></h3>
+            <div class="calendario__navegacao">
+              <button type="button" class="botao botao--mini" id="calendario-anterior" aria-label="Mês anterior">‹</button>
+              <button type="button" class="botao botao--mini" id="calendario-hoje">Hoje</button>
+              <button type="button" class="botao botao--mini" id="calendario-proximo" aria-label="Próximo mês">›</button>
+            </div>
+          </div>
+          <table class="calendario">
+            <caption class="sr-only">Tarefas organizadas por prazo no mês selecionado</caption>
+            <thead>
+              <tr>
+                <th scope="col">Seg</th>
+                <th scope="col">Ter</th>
+                <th scope="col">Qua</th>
+                <th scope="col">Qui</th>
+                <th scope="col">Sex</th>
+                <th scope="col">Sáb</th>
+                <th scope="col">Dom</th>
+              </tr>
+            </thead>
+            <tbody id="calendario-corpo"></tbody>
+          </table>
+          <p id="calendario-vazio" class="vazio" hidden>Nenhuma tarefa corresponde aos filtros.</p>
+        </section>
       </section>
     </main>
 

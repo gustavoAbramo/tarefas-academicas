@@ -10,7 +10,7 @@ Projeto da atividade prática **"Desenvolvimento de aplicativo com API REST, TDD
 | --- | --- |
 | API REST | API própria em Node.js + Express, CRUD completo, JSON, códigos HTTP 200/201/204/400/404/500 |
 | Persistência | SQLite (arquivo `data/tarefas.db`), módulo nativo `node:sqlite`, sem instalar servidor de banco |
-| Interface | Site responsivo (HTML, CSS e JavaScript) que consome a API |
+| Interface | Site responsivo com lista e calendário mensal de prazos (HTML, CSS e JavaScript) que consome a API |
 | TDD | Testes com Vitest + Supertest, escritos antes do código (veja [docs/tdd.md](docs/tdd.md)) |
 | Git | Branches por funcionalidade, merges, commits `test(red)` → `feat(green)` → `refactor` |
 

@@ -152,6 +152,9 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
 /* Lista */
 .lista__cabecalho { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 14px; }
 .lista__cabecalho h2 { margin: 0; }
+.visualizacao { display: flex; gap: 6px; }
+.botao--visualizacao { padding: 6px 12px; font-size: .85rem; }
+.botao--visualizacao[aria-pressed="true"] { border-color: var(--primaria); background: var(--primaria-suave); color: var(--primaria); }
 .filtros { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .filtros select, .filtros input[type="search"] { width: auto; padding: 6px 10px; font-size: .85rem; }
 .filtros input[type="search"] { min-width: 190px; }
@@ -160,6 +163,25 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
 
 .lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
 .vazio { color: var(--texto-suave); text-align: center; padding: 32px 8px; }
+
+.calendario-painel { min-width: 0; }
+.calendario__cabecalho { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 4px 0 12px; }
+.calendario__cabecalho h3 { font-size: 1rem; text-transform: capitalize; }
+.calendario__navegacao { display: flex; gap: 6px; }
+.calendario { width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 4px; }
+.calendario th { padding: 6px 4px; color: var(--texto-suave); font-size: .78rem; font-weight: 600; text-align: center; }
+.calendario__dia { height: 112px; padding: 6px; vertical-align: top; border: 1px solid var(--borda); border-radius: 8px; background: var(--superficie); }
+.calendario__dia--outro-mes { background: var(--fundo); }
+.calendario__dia--outro-mes .calendario__numero { color: var(--texto-suave); opacity: .6; }
+.calendario__dia--hoje { border-color: var(--primaria); box-shadow: inset 0 0 0 1px var(--primaria); }
+.calendario__numero { display: block; width: fit-content; margin-bottom: 4px; font-size: .8rem; font-weight: 700; }
+.calendario__dia--hoje .calendario__numero { color: var(--primaria); }
+.calendario__tarefa { display: block; width: 100%; margin-top: 3px; padding: 3px 5px; overflow: hidden; border: 0; border-left: 3px solid var(--info); border-radius: 4px; background: var(--info-suave); color: var(--texto); cursor: pointer; font-size: .72rem; line-height: 1.3; text-align: left; text-overflow: ellipsis; white-space: nowrap; }
+.calendario__tarefa:hover { filter: brightness(.96); }
+.calendario__tarefa--alta { border-left-color: var(--alerta); background: var(--alerta-suave); }
+.calendario__tarefa--media { border-left-color: var(--aviso); background: var(--aviso-suave); }
+.calendario__tarefa--baixa { border-left-color: var(--info); background: var(--info-suave); }
+.calendario__tarefa--concluida { opacity: .65; text-decoration: line-through; }
 
 .tarefa {
   border: 1px solid var(--borda); border-left: 4px solid var(--borda); border-radius: 10px;
@@ -201,6 +223,12 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
   .tarefa__rodape { padding-left: 0; }
   .tarefa__acoes { margin-left: 0; }
   .campo-linha { grid-template-columns: 1fr; gap: 0; }
+  .lista__cabecalho { align-items: flex-start; }
+  .calendario { border-spacing: 2px; }
+  .calendario th { padding: 4px 0; font-size: .68rem; }
+  .calendario__dia { height: 78px; padding: 3px; }
+  .calendario__numero { font-size: .72rem; }
+  .calendario__tarefa { padding: 2px; border-left-width: 2px; font-size: .62rem; }
 }
 
 /* Toast */
