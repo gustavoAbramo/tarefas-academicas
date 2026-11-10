@@ -65,6 +65,7 @@ Não é preciso configurar nada para rodar. Opcionalmente, defina variáveis de 
 | --- | --- | --- |
 | `PORT` | `3000` | porta do servidor |
 | `DB_PATH` | `data/tarefas.db` | arquivo do banco SQLite (criado automaticamente) |
+| `NODE_ENV` | não definido | define o ambiente; o histórico de requisições da API fica oculto quando o valor é `production` |
 
 O projeto **não usa senhas, tokens nem credenciais**. O arquivo do banco fica fora do Git (`.gitignore`).
 

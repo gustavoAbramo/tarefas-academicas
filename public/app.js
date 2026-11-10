@@ -260,15 +260,19 @@ document.querySelectorAll('.resumo__item').forEach((botao) => {
 
 // ---------- painel "últimas requisições à API" (mais recente primeiro) ----------
 
-const historicoApi = [];
-observarRespostas(({ metodo, url, enviado, status, recebido }) => {
-  const linhas = [`${metodo} ${url}  →  ${status}`];
-  if (enviado !== undefined) linhas.push('Enviado:', JSON.stringify(enviado, null, 2));
-  linhas.push('Recebido:', recebido === null ? '(sem corpo)' : JSON.stringify(recebido, null, 2));
-  historicoApi.unshift(linhas.join('\n'));
-  historicoApi.length = Math.min(historicoApi.length, 6);
-  $('#api-log').textContent = historicoApi.join('\n\n────────────\n\n');
-});
+const painelLogApi = $('.api-log');
+if (window.APP_CONFIG?.showApiLog) {
+  painelLogApi.hidden = false;
+  const historicoApi = [];
+  observarRespostas(({ metodo, url, enviado, status, recebido }) => {
+    const linhas = [`${metodo} ${url}  →  ${status}`];
+    if (enviado !== undefined) linhas.push('Enviado:', JSON.stringify(enviado, null, 2));
+    linhas.push('Recebido:', recebido === null ? '(sem corpo)' : JSON.stringify(recebido, null, 2));
+    historicoApi.unshift(linhas.join('\n'));
+    historicoApi.length = Math.min(historicoApi.length, 6);
+    $('#api-log').textContent = historicoApi.join('\n\n────────────\n\n');
+  });
+}
 
 // ---------- início ----------
 
