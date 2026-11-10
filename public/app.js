@@ -13,6 +13,7 @@ const filtros = {
 };
 
 const ROTULO_PRIORIDADE = { alta: 'Prioridade alta', media: 'Prioridade média', baixa: 'Prioridade baixa' };
+const ORDEM_PRIORIDADE = { alta: 0, media: 1, baixa: 2 };
 
 // ---------- utilidades ----------
 
@@ -33,6 +34,15 @@ function textoPrazo(tarefa) {
   if (dias === 0) return 'Vence hoje';
   if (dias === 1) return 'Vence amanhã';
   return `${formatarData(tarefa.prazo)} · em ${dias} dias`;
+}
+
+function compararTarefas(a, b) {
+  const aConcluida = a.status === 'concluida';
+  const bConcluida = b.status === 'concluida';
+  if (aConcluida !== bConcluida) return Number(aConcluida) - Number(bConcluida);
+  if (a.atrasada !== b.atrasada) return Number(b.atrasada) - Number(a.atrasada);
+  return a.prazo.localeCompare(b.prazo)
+    || ORDEM_PRIORIDADE[a.prioridade] - ORDEM_PRIORIDADE[b.prioridade];
 }
 
 let timerToast;
@@ -105,7 +115,7 @@ async function carregarTarefas() {
     prioridade: filtros.prioridade.value,
     atrasadas: filtros.atrasadas.checked ? 'true' : '',
   });
-  lista.replaceChildren(...tarefas.map(renderizarTarefa));
+  lista.replaceChildren(...[...tarefas].sort(compararTarefas).map(renderizarTarefa));
   $('#vazio').hidden = tarefas.length > 0;
 
   for (const t of tarefas) if (t.disciplina) disciplinasConhecidas.add(t.disciplina);
